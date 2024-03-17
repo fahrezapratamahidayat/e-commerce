@@ -49,3 +49,50 @@ export async function SignUp(userData: {
         })
     }
 }
+
+export async function LoginUsers(data: { email: string; password: string }) {
+    const q = query(
+      collection(firestore, "users"),
+      where("email", "==", data.email)
+    );
+  
+    try {
+      const querySnapshot = await getDocs(q);
+  
+      if (querySnapshot.empty) {
+        return {
+          status: false,
+          statusCode: 404,
+          message: "User not found",
+        };
+      }
+  
+      const user: any = querySnapshot.docs[0].data();
+      const passwordMatch = await bcrypt.compare(data.password, user.password);
+  
+      if (passwordMatch) {
+        return {
+          status: true,
+          statusCode: 200,
+          message: "Login successful",
+          user: {
+            id: querySnapshot.docs[0].id,
+            ...user,
+          },
+        };
+      } else {
+        return {
+          status: false,
+          statusCode: 401,
+          message: "Invalid password",
+        };
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      return {
+        status: false,
+        statusCode: 500,
+        message: "Internal server error",
+      };
+    }
+  }
