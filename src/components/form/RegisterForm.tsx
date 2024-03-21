@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { useRouter } from "next/router";
 import { useState } from "react";;
 import { Loader2 } from "lucide-react";
+import instance from "@/lib/axios/instance";
 
 const formSchema = z
   .object({
@@ -55,21 +56,18 @@ export default function RegisterForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     const { fullname, email, password, phoneNumber } = values;
-    const response = await fetch("/api/users", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ fullname, email, password, phoneNumber }),
+    const response = await instance.post("/api/users/registers", {
+      fullname,
+      email,
+      password,
+      phoneNumber,
     });
-    const data = await response.json();
-    if (response.status === 200) {
+    if(response.status === 200) {
       form.reset();
-      setIsLoading(false);
-      router.push("/login");
-    } else {
-      alert(data.message);
-      setIsLoading(false);
+      setIsLoading(false)
+      router.push("/login")
+    }else{
+      setIsLoading(false)
     }
   }
   return (
