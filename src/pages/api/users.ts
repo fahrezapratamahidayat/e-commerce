@@ -1,4 +1,4 @@
-import { SignUp } from "@/lib/firebase/services";
+import { SignUp } from "@/services/auth/services";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 
