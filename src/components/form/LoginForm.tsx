@@ -58,6 +58,7 @@ export default function LoginForm() {
         push(callbackUrl);
       } else {
         setIsLoading(false);
+
       }
     } catch (error) {
       setIsLoading(false);
@@ -132,7 +133,7 @@ export default function LoginForm() {
         <Button
           className="w-full flex gap-2 items-center justify-center"
           variant="outline"
-          onClick={() => signIn("google", { callbackUrl, redirect: false })}
+          onClick={() => signIn("google", { callbackUrl , redirect: false })}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

@@ -1,9 +1,9 @@
-import { LoginGoogle, LoginUsers } from "@/lib/firebase/services";
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcrypt"
 import NextAuth from "next-auth/next";
+import { LoginGoogle, LoginUsers } from "@/services/auth/services";
 
 const authOptions: NextAuthOptions = {
     session: {
@@ -23,26 +23,21 @@ const authOptions: NextAuthOptions = {
                     email: string;
                     password: string;
                 };
-                const users: any = await LoginUsers({ email, password });
+                const users: any = await LoginUsers(email);
                 if (users.status) {
                     const passwordMatch = await bcrypt.compare(password, users.user.password);
                     if (passwordMatch) {
+                        console.log(users.user)
                         return users.user
                     }
-                } else if (users.statusCode === 401) {
-                    if (users.message === "Invalid password") {
-                        return null
-                    }
                 } else {
-                    if (users.message === "User not found") {
-                        return null
-                    }
+                    throw new Error(JSON.stringify({ status: false, message: "user not found" }));
                 }
             },
         }),
         GoogleProvider({
-            clientId: process.env.GOOGLE_OATH_CLIENTID as string,
-            clientSecret: process.env.GOOGLE_OATH_SECRETID as string,
+            clientId: process.env.GOOGLE_OATH_CLIENTID || "",
+            clientSecret: process.env.GOOGLE_OATH_SECRETID || "",
         }),
     ],
     callbacks: {
@@ -63,12 +58,12 @@ const authOptions: NextAuthOptions = {
                     idp: "google",
                     role: user.role
                 }
-                await LoginGoogle(data, (user: any) => {
-                    token.email = user.email
-                    token.fullname = user.fullame
-                    token.id = user.id
-                    token.idp = "google"
-                    token.role = user.role
+                await LoginGoogle(data, (data: any) => {
+                    token.email = data.email
+                    token.fullname = data.fullame
+                    token.id = data.id
+                    token.idp = data.idp
+                    token.role = data.role
                 })
             }
             return token;
