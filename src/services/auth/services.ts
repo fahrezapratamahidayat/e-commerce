@@ -47,6 +47,8 @@ export async function SignUp(userData: {
   phoneNumber: number,
   createdAt?: Date,
   updatedAt?: Date,
+  profileUrl?: string
+  idp?: string
 }, callBack: Function) {
   const data = await getDataByField("users", "email", userData.email)
   
@@ -55,6 +57,12 @@ export async function SignUp(userData: {
   } else {
     if (!userData.role) {
       userData.role = "member"
+    }
+    if(!userData.profileUrl){
+      userData.profileUrl = ""
+    }
+    if(!userData.idp){
+      userData.idp = "credentials"
     }
     userData.createdAt = new Date();
     userData.updatedAt = new Date();
